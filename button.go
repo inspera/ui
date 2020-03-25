@@ -47,6 +47,17 @@ func (b *Button) SetText(text string) {
 	freestr(ctext)
 }
 
+func (b *Button) PreferredSize() (int, int) {
+	var width C.int = 0;
+	var height C.int = 0;
+	C.uiButtonPreferredSize(b.b, &width, &height)
+	return int(width), int(height)
+}
+
+func (b *Button) SetMinSize(width int, height int) {
+	C.uiButtonSetMinSize(b.b, C.int(width), C.int(height))
+}
+
 // OnClicked registers f to be run when the user clicks the Button.
 // Only one function can be registered at a time.
 func (b *Button) OnClicked(f func(*Button)) {
