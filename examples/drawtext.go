@@ -7,8 +7,8 @@ package main
 // TODO probably a bug in libui: changing the font away from skia leads to a crash
 
 import (
-	"github.com/andlabs/ui"
-	_ "github.com/andlabs/ui/winmanifest"
+	"github.com/inspera/ui"
+	_ "github.com/inspera/ui/winmanifest"
 )
 
 var (
