@@ -19,8 +19,22 @@ func makeBasicControlsPage() ui.Control {
 	hbox.SetPadded(true)
 	vbox.Append(hbox, false)
 
-	hbox.Append(ui.NewButton("Button"), false)
+	btn := ui.NewButton("Button")
+	hbox.Append(btn, false)
+
 	hbox.Append(ui.NewCheckbox("Checkbox"), false)
+
+	wide_btn := ui.NewButton("Button with very long text")
+	hbox.Append(wide_btn, false)
+
+	w1, _:= (*btn).PreferredSize()
+	w2, _ := (*wide_btn).PreferredSize()
+	max_w := w1
+	if max_w < w2 {
+		max_w = w2
+	}
+	btn.SetMinSize(max_w, -1)
+	btn.SetMinSize(max_w, -1)
 
 	vbox.Append(ui.NewLabel("This is a label. Right now, labels can only span one line."), false)
 
