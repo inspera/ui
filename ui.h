@@ -97,6 +97,7 @@ struct uiControl {
 	int (*Enabled)(uiControl *);
 	void (*Enable)(uiControl *);
 	void (*Disable)(uiControl *);
+	void (*SetFocus)(uiControl *);
 };
 // TOOD add argument names to all arguments
 #define uiControl(this) ((uiControl *) (this))
@@ -111,6 +112,7 @@ _UI_EXTERN void uiControlHide(uiControl *);
 _UI_EXTERN int uiControlEnabled(uiControl *);
 _UI_EXTERN void uiControlEnable(uiControl *);
 _UI_EXTERN void uiControlDisable(uiControl *);
+_UI_EXTERN void uiControlSetFocus(uiControl *);
 
 _UI_EXTERN uiControl *uiAllocControl(size_t n, uint32_t OSsig, uint32_t typesig, const char *typenamestr);
 _UI_EXTERN void uiFreeControl(uiControl *);
@@ -169,6 +171,8 @@ typedef struct uiEntry uiEntry;
 #define uiEntry(this) ((uiEntry *) (this))
 _UI_EXTERN char *uiEntryText(uiEntry *e);
 _UI_EXTERN void uiEntrySetText(uiEntry *e, const char *text);
+_UI_EXTERN void uiEntrySelectText(uiEntry *e, int start, int end);
+_UI_EXTERN void uiEntrySelectAllText(uiEntry *e);
 _UI_EXTERN void uiEntryOnChanged(uiEntry *e, void (*f)(uiEntry *e, void *data), void *data);
 _UI_EXTERN void uiEntryOnKeyEvent(uiEntry *e, int (*f)(uiEntry *e, uiAreaKeyEvent *event));
 _UI_EXTERN int uiEntryReadOnly(uiEntry *e);

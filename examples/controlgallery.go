@@ -10,6 +10,7 @@ import (
 )
 
 var mainwin *ui.Window
+var focusable *ui.Entry
 
 func makeBasicControlsPage() ui.Control {
 	vbox := ui.NewVerticalBox()
@@ -26,8 +27,14 @@ func makeBasicControlsPage() ui.Control {
 
 	wide_btn := ui.NewButton("Button with very long text")
 	hbox.Append(wide_btn, false)
+	wide_btn.OnClicked(func(*ui.Button) {
+		if focusable != nil {
+			focusable.SetFocus()
+			focusable.SelectAllText()
+		}
+	})
 
-	w1, _:= (*btn).PreferredSize()
+	w1, _ := (*btn).PreferredSize()
 	w2, _ := (*wide_btn).PreferredSize()
 	max_w := w1
 	if max_w < w2 {
@@ -44,13 +51,14 @@ func makeBasicControlsPage() ui.Control {
 	group.SetMargined(true)
 	vbox.Append(group, true)
 
-group.SetChild(ui.NewNonWrappingMultilineEntry())
+	group.SetChild(ui.NewNonWrappingMultilineEntry())
 
 	entryForm := ui.NewForm()
 	entryForm.SetPadded(true)
 	group.SetChild(entryForm)
 
-	entryForm.Append("Entry", ui.NewEntry(), false)
+	focusable = ui.NewEntry()
+	entryForm.Append("Entry", focusable, false)
 	entryForm.Append("Password Entry", ui.NewPasswordEntry(), false)
 	entryForm.Append("Search Entry", ui.NewSearchEntry(), false)
 	entryForm.Append("Multiline Entry", ui.NewMultilineEntry(), true)
