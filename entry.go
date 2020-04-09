@@ -17,9 +17,9 @@ import "C"
 // type a single line of text into.
 type Entry struct {
 	ControlBase
-	e	*C.uiEntry
-	onChanged		func(*Entry)
-	onKeyEvent		func(*Entry, *AreaKeyEvent) (handled bool)
+	e          *C.uiEntry
+	onChanged  func(*Entry)
+	onKeyEvent func(*Entry, *AreaKeyEvent) (handled bool)
 }
 
 func finishNewEntry(ee *C.uiEntry) *Entry {
@@ -67,6 +67,14 @@ func (e *Entry) SetText(text string) {
 	freestr(ctext)
 }
 
+func (e *Entry) SelectAllText() {
+	C.uiEntrySelectAllText(e.e)
+}
+
+func (e *Entry) SelectText(start int, end int) {
+	C.uiEntrySelectText(e.e, C.int(start), C.int(end))
+}
+
 // OnChanged registers f to be run when the user makes a change to
 // the Entry. Only one function can be registered at a time.
 func (e *Entry) OnChanged(f func(*Entry)) {
@@ -83,18 +91,18 @@ func pkguiDoEntryOnChanged(ee *C.uiEntry, data unsafe.Pointer) {
 
 // OnKeyEvent registers f to be run when the user makes a change to
 // the Entry. Only one function can be registered at a time.
-func (e *Entry) OnKeyEvent(f func(*Entry, *AreaKeyEvent) (handled bool) ) {
+func (e *Entry) OnKeyEvent(f func(*Entry, *AreaKeyEvent) (handled bool)) {
 	e.onKeyEvent = f
 }
 
 //export pkguiDoEntryOnKeyEvent
 func pkguiDoEntryOnKeyEvent(ee *C.uiEntry, uke *C.uiAreaKeyEvent) C.int {
 	ke := &AreaKeyEvent{
-		Key:		rune(uke.Key),
-		ExtKey:		ExtKey(uke.ExtKey),
-		Modifier:	Modifiers(uke.Modifier),
-		Modifiers:	Modifiers(uke.Modifiers),
-		Up:			tobool(uke.Up),
+		Key:       rune(uke.Key),
+		ExtKey:    ExtKey(uke.ExtKey),
+		Modifier:  Modifiers(uke.Modifier),
+		Modifiers: Modifiers(uke.Modifiers),
+		Up:        tobool(uke.Up),
 	}
 	e := ControlFromLibui(uintptr(unsafe.Pointer(ee))).(*Entry)
 	if e.onKeyEvent != nil {
