@@ -61,6 +61,10 @@ func (w *Window) SetTitle(title string) {
 	freestr(ctitle)
 }
 
+func (w *Window) SetCentered() {
+	C.uiWindowSetCentered(w.w)
+}
+
 // TODO ContentSize
 // TODO SetContentSize
 // TODO Fullscreen
