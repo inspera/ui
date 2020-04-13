@@ -65,6 +65,18 @@ func (w *Window) SetCentered() {
 	C.uiWindowSetCentered(w.w)
 }
 
+func (w *Window) SetToFront() {
+	C.uiWindowSetToFront(w.w)
+}
+
+func (w *Window) SetAlwaysVisible(set bool) {
+	if set {
+		C.uiWindowSetAlwaysVisible(w.w)
+	} else {
+		C.uiWindowResetAlwaysVisible(w.w)
+	}
+}
+
 // TODO ContentSize
 // TODO SetContentSize
 // TODO Fullscreen
