@@ -120,3 +120,7 @@ func (e *Entry) ReadOnly() bool {
 func (e *Entry) SetReadOnly(ro bool) {
 	C.uiEntrySetReadOnly(e.e, frombool(ro))
 }
+
+func (e *Entry) UnsetFocus() {
+	C.uiEntryUnsetFocus(e.e)
+}
