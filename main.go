@@ -42,6 +42,22 @@ func Main(f func()) error {
 	return nil
 }
 
+func MainAdjusted(f func(), skipTheme int) error {
+	opts := C.pkguiAllocInitOptions()
+	opts.skipTheme = C.int(skipTheme)
+	estr := C.uiInit(opts)
+	C.pkguiFreeInitOptions(opts)
+	if estr != nil {
+		err := errors.New(C.GoString(estr))
+		C.uiFreeInitError(estr)
+		return err
+	}
+	C.pkguiOnShouldQuit()
+	QueueMain(f)
+	C.uiMain()
+	return nil
+}
+
 // Quit queues a return from Main. It does not exit the program.
 // It also does not immediately cause Main to return; Main will
 // return when it next can. Quit must be called from the GUI thread.

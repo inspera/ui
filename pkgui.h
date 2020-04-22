@@ -15,6 +15,7 @@ extern void pkguiOnShouldQuit(void);
 
 // window.go
 extern void pkguiWindowOnClosing(uiWindow *w);
+extern void pkguiWindowOnResign(uiWindow *w);
 
 // button.go
 extern void pkguiButtonOnClicked(uiButton *b);

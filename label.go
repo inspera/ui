@@ -28,6 +28,18 @@ func NewLabel(text string) *Label {
 	return l
 }
 
+// NewLabel creates a new Label with the given text.
+func NewCenteredLabel(text string) *Label {
+	l := new(Label)
+
+	ctext := C.CString(text)
+	l.l = C.uiNewCenteredLabel(ctext)
+	freestr(ctext)
+
+	l.ControlBase = NewControlBase(l, uintptr(unsafe.Pointer(l.l)))
+	return l
+}
+
 // Text returns the Label's text.
 func (l *Label) Text() string {
 	ctext := C.uiLabelText(l.l)
@@ -41,4 +53,14 @@ func (l *Label) SetText(text string) {
 	ctext := C.CString(text)
 	C.uiLabelSetText(l.l, ctext)
 	freestr(ctext)
+}
+
+func (l *Label) SetFont(name string, size int, weight TextWeight) {
+	cname := C.CString(name)
+	C.uiLabelSetFont(l.l, cname, C.int(size), C.int(weight), C.int(0))
+	freestr(cname)
+}
+
+func (l *Label) SetMinSize(w int, h int) {
+	C.uiLabelSetMinSize(l.l, C.int(w), C.int(h))
 }

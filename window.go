@@ -18,6 +18,7 @@ type Window struct {
 	w	*C.uiWindow
 	child		Control
 	onClosing		func(w *Window) bool
+	onResign		func(w *Window)
 }
 
 // NewWindow creates a new Window.
@@ -29,6 +30,7 @@ func NewWindow(title string, width int, height int, hasMenubar bool) *Window {
 	freestr(ctitle)
 
 	C.pkguiWindowOnClosing(w.w)
+	C.pkguiWindowOnResign(w.w)
 
 	w.ControlBase = NewControlBase(w, uintptr(unsafe.Pointer(w.w)))
 	return w
@@ -37,7 +39,7 @@ func NewWindow(title string, width int, height int, hasMenubar bool) *Window {
 // Destroy destroys the Window. If the Window has a child,
 // Destroy calls Destroy on that as well.
 func (w *Window) Destroy() {
-	w.Hide()		// first hide the window, in case anything in the below if statement forces an immediate redraw
+	w.Hide() // first hide the window, in case anything in the below if statement forces an immediate redraw
 	if w.child != nil {
 		c := w.child
 		w.SetChild(nil)
@@ -104,6 +106,19 @@ func pkguiDoWindowOnClosing(ww *C.uiWindow, data unsafe.Pointer) C.int {
 	return 0
 }
 
+func (w *Window) OnResign(f func(*Window)) {
+	w.onResign = f
+}
+
+//export pkguiDoWindowOnResign
+func pkguiDoWindowOnResign(ww *C.uiWindow) {
+	w := ControlFromLibui(uintptr(unsafe.Pointer(ww))).(*Window)
+	if w.onResign == nil {
+		return
+	}
+	w.onResign(w)
+}
+
 // Borderless returns whether the Window is borderless.
 func (w *Window) Borderless() bool {
 	return tobool(C.uiWindowBorderless(w.w))
@@ -135,4 +150,8 @@ func (w *Window) Margined() bool {
 // best practices.
 func (w *Window) SetMargined(margined bool) {
 	C.uiWindowSetMargined(w.w, frombool(margined))
+}
+
+func (w *Window) SetBackgroundColor(r, g, b int) {
+	C.uiWindowSetBackgroundColor(w.w, C.int(r), C.int(g), C.int(b))
 }

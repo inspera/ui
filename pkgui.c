@@ -27,6 +27,11 @@ void pkguiWindowOnClosing(uiWindow *w)
 	uiWindowOnClosing(w, pkguiDoWindowOnClosing, NULL);
 }
 
+void pkguiWindowOnResign(uiWindow *w)
+{
+	uiWindowOnResign(w, pkguiDoWindowOnResign);
+}
+
 void pkguiButtonOnClicked(uiButton *b)
 {
 	uiButtonOnClicked(b, pkguiDoButtonOnClicked, NULL);
