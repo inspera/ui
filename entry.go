@@ -124,3 +124,31 @@ func (e *Entry) SetReadOnly(ro bool) {
 func (e *Entry) UnsetFocus() {
 	C.uiEntryUnsetFocus(e.e)
 }
+
+func (e *Entry) SetFont(name string, size int, weight TextWeight) {
+	cname := C.CString(name)
+	C.uiEntrySetFont(e.e, cname, C.int(size), C.int(weight), C.int(0))
+	freestr(cname)
+}
+
+func (e *Entry) SetPasswordChar(ch string) {
+	cch := C.CString(ch)
+	C.uiEntryPasswordChar(e.e, *cch)
+	freestr(cch)
+}
+
+func (e *Entry) CenterText(center bool) {
+	i := 0
+	if center {
+		i = 1
+	}
+	C.uiEntryCenterText(e.e, C.int(i))
+}
+
+func (e *Entry) SetMaxLength(max int) {
+	C.uiEntrySetMaxLength(e.e, C.int(max))
+}
+
+func (e *Entry) SetPrefSize(w, h int) {
+	C.uiEntrySetPrefSize(e.e, C.int(w), C.int(h))
+}
