@@ -58,6 +58,13 @@ func MainAdjusted(f func(), skipTheme int) error {
 	return nil
 }
 
+// Quit queues a return from Main. It does not exit the program.
+// It also does not immediately cause Main to return; Main will
+// return when it next can. Quit must be called from the GUI thread.
+func Quit() {
+	C.uiQuit()
+}
+
 // These prevent the passing of Go functions into C land.
 // TODO make an actual sparse list instead of this monotonic map thingy
 var (
