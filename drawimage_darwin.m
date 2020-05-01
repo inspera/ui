@@ -3,11 +3,11 @@
 
 /* javascript:void(document.getElementById("editor").env.editor.session.setMode("ace/mode/objectivec")) */
 
-struct insperaUiDrawContext {
+struct DrawContext_native {
     CGContextRef OSContext;
 };
 
-const char insperaDrawImage(
+const char DrawImage_native(
     void** theContext,
     const char bunnyImage[],
     unsigned int width,
@@ -19,13 +19,13 @@ const char insperaDrawImage(
     const size_t bitsPerChannel = 8;
     const size_t channelCount   = 4;
 
-    struct insperaUiDrawContext *context = NULL;
+    struct DrawContext_native *context = NULL;
     size_t imageSize = 0;
     CGDataProviderRef bitmapDataProvider = NULL;
     CGImageRef bitmap = NULL;
     CGColorSpaceRef rgbColorSpace = NULL;
 
-    context = (struct insperaUiDrawContext*)(*theContext);
+    context = (struct DrawContext_native*)(*theContext);
     imageSize = width * height * channelCount;
 
     // Must be released manually

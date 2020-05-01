@@ -6,13 +6,13 @@
 
 // void(document.getElementById("editor").env.editor.session.setMode("ace/mode/c_cpp"))
 
-extern "C" const char insperaDrawImage(void**,  const char*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+extern "C" const char DrawImage_native(void**,  const char*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 
-struct insperaUiDrawContext {
+struct DrawContext_native {
     ID2D1RenderTarget *rt;
 };
 
-const char insperaDrawImage(
+const char DrawImage_native(
     void** theContext,
     const char bunnyImage[],
     unsigned int width,
@@ -21,10 +21,10 @@ const char insperaDrawImage(
     unsigned int x,
     unsigned int y
 ) {
-    struct insperaUiDrawContext *context = NULL;
+    struct DrawContext_native *context = NULL;
     ID2D1Bitmap *bitmap = NULL;
     D2D1_PIXEL_FORMAT pixelFormat;
-    context = (struct insperaUiDrawContext*)(*theContext);
+    context = (struct DrawContext_native*)(*theContext);
 
     pixelFormat = D2D1::PixelFormat(
         DXGI_FORMAT_B8G8R8A8_UNORM,

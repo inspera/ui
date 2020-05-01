@@ -9,14 +9,14 @@ import (
 
 // #cgo darwin CFLAGS: -fno-objc-arc -mmacosx-version-min=10.8
 // #cgo darwin LDFLAGS: -framework Foundation -framework AppKit -mmacosx-version-min=10.8
-// const char insperaDrawImage(void**, const char*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+// const char DrawImage_native(void**, const char*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 import "C"
 
 func (ctx *DrawContext) DrawImage(img *image.Image, x, y uint) {
 	rgbaImage := imageToRGBA(*img)
 	startPixel := uint(rgbaImage.PixOffset(rgbaImage.Rect.Min.X, rgbaImage.Rect.Min.Y))
 
-	C.insperaDrawImage(
+	C.DrawImage_native(
 		(*unsafe.Pointer)(unsafe.Pointer(ctx)),
 		(*C.char)(unsafe.Pointer(&rgbaImage.Pix[startPixel])),
 		C.uint(rgbaImage.Rect.Max.X-rgbaImage.Rect.Min.X),
