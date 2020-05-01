@@ -54,3 +54,10 @@ func (b *Bitmap) Free() {
 func (b *Bitmap) Draw(x, y float64) {
 	C.uiDrawBitmap(b.ctx.c, b.bmp, C.double(x), C.double(y))
 }
+
+// DrawImage is a convenience shortcut to create and draw a disposable bitmap.
+func (c *DrawContext) DrawImage(img image.Image, x, y float64) {
+	bmp := c.NewBitmap(img)
+	defer bmp.Free()
+	bmp.Draw(x, y)
+}
