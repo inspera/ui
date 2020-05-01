@@ -12,6 +12,16 @@ package ui
 // void uiFreeBitmap(uiDrawContext *ctx, uiBitmap *bmp);
 // void uiDrawBitmap(uiDrawContext *ctx, uiBitmap *bmp, double x, double y);
 //
+// int uiDrawImage(uiDrawContext *ctx, int width, int height, int stride,
+//                 const void *rgba, double x, double y) {
+//   uiBitmap *bmp = uiNewBitmap(ctx, width, height, stride, rgba);
+//   if (bmp) {
+//     uiDrawBitmap(ctx, bmp, x, y);
+//     uiFreeBitmap(ctx, bmp);
+//   }
+//   return !!bmp;
+// }
+//
 import "C"
 
 import (
@@ -26,18 +36,23 @@ type Bitmap struct {
 	bmp *C.uiBitmap
 }
 
-// NewBitmap creates a new bitmap from a given image. The resulting bitmap is
-// associated with the current drawing context.
-func (c *DrawContext) NewBitmap(img image.Image) *Bitmap {
+func imageToRGBAData(img image.Image) (C.int, C.int, C.int, unsafe.Pointer) {
 	bounds := img.Bounds()
 	rgba, ok := img.(*image.RGBA)
 	if !ok {
 		rgba = image.NewRGBA(bounds)
 		draw.Draw(rgba, bounds, img, bounds.Min, draw.Src)
 	}
+	return C.int(bounds.Dx()), C.int(bounds.Dy()),
+		C.int(rgba.Stride), unsafe.Pointer(&rgba.Pix[0])
+}
 
-	bmp := C.uiNewBitmap(c.c, C.int(bounds.Dx()), C.int(bounds.Dy()),
-		C.int(rgba.Stride), unsafe.Pointer(&rgba.Pix[0]))
+// NewBitmap creates a new bitmap from a given image. The resulting bitmap is
+// associated with the current drawing context.
+func (c *DrawContext) NewBitmap(img image.Image) *Bitmap {
+	width, height, stride, rgba := imageToRGBAData(img)
+
+	bmp := C.uiNewBitmap(c.c, width, height, stride, rgba)
 	if bmp == nil {
 		panic("failed to create a bitmap")
 	}
@@ -55,9 +70,11 @@ func (b *Bitmap) Draw(x, y float64) {
 	C.uiDrawBitmap(b.ctx.c, b.bmp, C.double(x), C.double(y))
 }
 
-// DrawImage is a convenience shortcut to create and draw a disposable bitmap.
+// DrawImage is a shortcut to create and draw a disposable bitmap.
 func (c *DrawContext) DrawImage(img image.Image, x, y float64) {
-	bmp := c.NewBitmap(img)
-	defer bmp.Free()
-	bmp.Draw(x, y)
+	width, height, stride, rgba := imageToRGBAData(img)
+	if C.uiDrawImage(c.c, width, height, stride, rgba,
+		C.double(x), C.double(y)) == 0 {
+		panic("failed to draw an image")
+	}
 }
