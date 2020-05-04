@@ -1,8 +1,11 @@
 #include <cstdio>
 #include <vector>
 
-#include <comdef.h>
+// See https://stackoverflow.com/questions/27888109/rendertarget-getsize-not-working
+#define WIDL_EXPLICIT_AGGREGATE_RETURNS
 #include <d2d1.h>
+
+#include <comdef.h>
 
 struct uiDrawContext {
   ID2D1RenderTarget *rt;
