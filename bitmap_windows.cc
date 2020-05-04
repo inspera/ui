@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <vector>
 
-// See https://stackoverflow.com/questions/27888109/rendertarget-getsize-not-working
+// See
+// https://stackoverflow.com/questions/27888109/rendertarget-getsize-not-working.
 #define WIDL_EXPLICIT_AGGREGATE_RETURNS
 #include <d2d1.h>
 
@@ -13,7 +14,10 @@ struct uiDrawContext {
   ID2D1PathGeometry *currentClip;
 };
 
-typedef struct ID2D1Bitmap uiBitmap;
+typedef struct uiBitmap {
+  ID2D1RenderTarget *rt;
+  ID2D1Bitmap *img;
+} uiBitmap;
 
 extern "C" {
 
@@ -25,9 +29,9 @@ uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
   float dpi_x, dpi_y;
   ctx->rt->GetDpi(&dpi_x, &dpi_y);
 
-  ID2D1Bitmap *bmp;
+  ID2D1Bitmap *img;
   auto res = ctx->rt->CreateBitmap(D2D1::SizeU(width, height), rgba, stride,
-                                   {fmt, dpi_x, dpi_y}, &bmp);
+                                   {fmt, dpi_x, dpi_y}, &img);
 
   if (res != S_OK) {
     // TODO: Pass an error message to the caller.
@@ -36,17 +40,20 @@ uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
     return nullptr;
   }
 
-  return bmp;
+  return new uiBitmap{ctx->rt, img};
 }
 
-void uiFreeBitmap(uiDrawContext *, uiBitmap *bmp) { bmp->Release(); }
+void uiFreeBitmap(uiBitmap *bmp) {
+  bmp->img->Release();
+  delete bmp;
+}
 
-void uiDrawBitmap(uiDrawContext *ctx, uiBitmap *bmp, double x, double y) {
-  auto size = bmp->GetSize();
+void uiDrawBitmap(uiBitmap *bmp, double x, double y) {
+  auto size = bmp->img->GetSize();
   D2D1_RECT_F rect{static_cast<float>(x), static_cast<float>(y),
                    static_cast<float>(size.width + x),
                    static_cast<float>(size.height + y)};
-  ctx->rt->DrawBitmap(bmp, rect, 1,
+  bmp->rt->DrawBitmap(bmp->img, rect, 1,
                       D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, nullptr);
 }
 

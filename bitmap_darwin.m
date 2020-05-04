@@ -5,7 +5,10 @@ typedef struct uiDrawContext {
   CGFloat height;
 } uiDrawContext;
 
-typedef struct CGImage uiBitmap;
+typedef struct {
+  CGContextRef ctx;
+  CGImageRef img;
+} uiBitmap;
 
 uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
                       const void *rgba) {
@@ -23,7 +26,7 @@ uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
   CGBitmapInfo info =
       kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little;
 
-  CGImageRef bmp = CGImageCreate(
+  CGImageRef img = CGImageCreate(
       width, height, kBitsPerComponent, kBitsPerComponent * kNumChannels,
       stride, space, info, data, NULL, NO, kCGRenderingIntentDefault);
 
@@ -32,21 +35,26 @@ uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
 
   CGContextRetain(ctx->c);
 
+  uiBitmap *bmp = malloc(sizeof(uiBitmap));
+  bmp->ctx = ctx->c;
+  bmp->img = img;
+
   return bmp;
 }
 
-void uiFreeBitmap(uiDrawContext *ctx, uiBitmap *bmp) {
-  CGImageRelease(bmp);
-  CGContextRelease(ctx->c);
+void uiFreeBitmap(uiBitmap *bmp) {
+  CGImageRelease(bmp->img);
+  CGContextRelease(bmp->ctx);
+  free(bmp);
 }
 
-void uiDrawBitmap(uiDrawContext *ctx, uiBitmap *bmp, double x, double y) {
-  size_t width = CGImageGetWidth(bmp);
-  size_t height = CGImageGetHeight(bmp);
+void uiDrawBitmap(uiBitmap *bmp, double x, double y) {
+  size_t width = CGImageGetWidth(bmp->img);
+  size_t height = CGImageGetHeight(bmp->img);
 
-  CGContextSaveGState(ctx->c);
-  CGContextTranslateCTM(ctx->c, 0, height + 2 * y);
-  CGContextScaleCTM(ctx->c, 1, -1);
-  CGContextDrawImage(ctx->c, CGRectMake(x, y, width, height), bmp);
-  CGContextRestoreGState(ctx->c);
+  CGContextSaveGState(bmp->ctx);
+  CGContextTranslateCTM(bmp->ctx, 0, height + 2 * y);
+  CGContextScaleCTM(bmp->ctx, 1, -1);
+  CGContextDrawImage(bmp->ctx, CGRectMake(x, y, width, height), bmp->img);
+  CGContextRestoreGState(bmp->ctx);
 }

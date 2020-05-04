@@ -9,15 +9,15 @@ package ui
 //
 // uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
 //                       const void *rgba);
-// void uiFreeBitmap(uiDrawContext *ctx, uiBitmap *bmp);
-// void uiDrawBitmap(uiDrawContext *ctx, uiBitmap *bmp, double x, double y);
+// void uiFreeBitmap(uiBitmap *bmp);
+// void uiDrawBitmap(uiBitmap *bmp, double x, double y);
 //
 // int uiDrawImage(uiDrawContext *ctx, int width, int height, int stride,
 //                 const void *rgba, double x, double y) {
 //   uiBitmap *bmp = uiNewBitmap(ctx, width, height, stride, rgba);
 //   if (bmp) {
-//     uiDrawBitmap(ctx, bmp, x, y);
-//     uiFreeBitmap(ctx, bmp);
+//     uiDrawBitmap(bmp, x, y);
+//     uiFreeBitmap(bmp);
 //   }
 //   return !!bmp;
 // }
@@ -32,8 +32,7 @@ import (
 
 // Bitmap represents a bitmap capable to be drawn on drawing context.
 type Bitmap struct {
-	ctx *DrawContext
-	bmp *C.uiBitmap
+	b *C.uiBitmap
 }
 
 func imageToRGBAData(img image.Image) (C.int, C.int, C.int, unsafe.Pointer) {
@@ -57,17 +56,17 @@ func (c *DrawContext) NewBitmap(img image.Image) *Bitmap {
 		panic("failed to create a bitmap")
 	}
 
-	return &Bitmap{c, bmp}
+	return &Bitmap{bmp}
 }
 
 // Free destroys the given bitmap.
 func (b *Bitmap) Free() {
-	C.uiFreeBitmap(b.ctx.c, b.bmp)
+	C.uiFreeBitmap(b.b)
 }
 
 // Draw draws the bitmap on its drawing context.
 func (b *Bitmap) Draw(x, y float64) {
-	C.uiDrawBitmap(b.ctx.c, b.bmp, C.double(x), C.double(y))
+	C.uiDrawBitmap(b.b, C.double(x), C.double(y))
 }
 
 // DrawImage is a shortcut to create and draw a disposable bitmap.
