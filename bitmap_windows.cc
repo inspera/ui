@@ -48,11 +48,15 @@ void uiFreeBitmap(uiBitmap *bmp) {
   delete bmp;
 }
 
-void uiDrawBitmap(uiBitmap *bmp, double x, double y) {
+void uiDrawBitmap(uiBitmap *bmp, double x, double y, double width,
+                  double height) {
   auto size = bmp->img->GetSize();
+  width = width > 0 ? width : size.width;
+  height = height > 0 ? height : size.height;
+
   D2D1_RECT_F rect{static_cast<float>(x), static_cast<float>(y),
-                   static_cast<float>(size.width + x),
-                   static_cast<float>(size.height + y)};
+                   static_cast<float>(width + x),
+                   static_cast<float>(height + y)};
   bmp->rt->DrawBitmap(bmp->img, rect, 1,
                       D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, nullptr);
 }

@@ -10,13 +10,15 @@ package ui
 // uiBitmap *uiNewBitmap(uiDrawContext *ctx, int width, int height, int stride,
 //                       const void *rgba);
 // void uiFreeBitmap(uiBitmap *bmp);
-// void uiDrawBitmap(uiBitmap *bmp, double x, double y);
+// void uiDrawBitmap(uiBitmap *bmp, double x, double y, double width,
+//                   double height);
 //
 // int uiDrawImage(uiDrawContext *ctx, int width, int height, int stride,
-//                 const void *rgba, double x, double y) {
+//                 const void *rgba, double x, double y, double draw_width,
+//                 double draw_height) {
 //   uiBitmap *bmp = uiNewBitmap(ctx, width, height, stride, rgba);
 //   if (bmp) {
-//     uiDrawBitmap(bmp, x, y);
+//     uiDrawBitmap(bmp, x, y, draw_width, draw_height);
 //     uiFreeBitmap(bmp);
 //   }
 //   return !!bmp;
@@ -66,14 +68,31 @@ func (b *Bitmap) Free() {
 
 // Draw draws the bitmap on its drawing context.
 func (b *Bitmap) Draw(x, y float64) {
-	C.uiDrawBitmap(b.b, C.double(x), C.double(y))
+	C.uiDrawBitmap(b.b, C.double(x), C.double(y), C.double(0), C.double(0))
+}
+
+// DrawWithSize draws the bitmap with a specified size on its drawing context.
+func (b *Bitmap) DrawWithSize(x, y, width, height float64) {
+	C.uiDrawBitmap(b.b, C.double(x), C.double(y),
+		C.double(width), C.double(height))
 }
 
 // DrawImage is a shortcut to create and draw a disposable bitmap.
 func (c *DrawContext) DrawImage(img image.Image, x, y float64) {
 	width, height, stride, rgba := imageToRGBAData(img)
 	if C.uiDrawImage(c.c, width, height, stride, rgba,
-		C.double(x), C.double(y)) == 0 {
+		C.double(x), C.double(y), C.double(0), C.double(0)) == 0 {
+		panic("failed to draw an image")
+	}
+}
+
+// DrawImageWithSize is a shortcut to create and draw a disposable bitmap with
+// a specified size.
+func (c *DrawContext) DrawImageWithSize(
+	img image.Image, x, y, width, height float64) {
+	rgbaWidth, rgbaHeight, stride, rgba := imageToRGBAData(img)
+	if C.uiDrawImage(c.c, rgbaWidth, rgbaHeight, stride, rgba,
+		C.double(x), C.double(y), C.double(width), C.double(height)) == 0 {
 		panic("failed to draw an image")
 	}
 }
