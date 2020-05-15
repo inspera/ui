@@ -48,9 +48,10 @@ void uiFreeBitmap(uiBitmap *bmp) {
   free(bmp);
 }
 
-void uiDrawBitmap(uiBitmap *bmp, double x, double y) {
-  size_t width = CGImageGetWidth(bmp->img);
-  size_t height = CGImageGetHeight(bmp->img);
+void uiDrawBitmap(uiBitmap *bmp, double x, double y, double height,
+                  double width) {
+  width = width > 0 ? width : CGImageGetWidth(bmp->img);
+  height = height > 0 ? height : CGImageGetHeight(bmp->img);
 
   CGContextSaveGState(bmp->ctx);
   CGContextTranslateCTM(bmp->ctx, 0, height + 2 * y);
